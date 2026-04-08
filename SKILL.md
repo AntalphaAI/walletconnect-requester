@@ -152,23 +152,41 @@ node scripts/wc-requester.js connect [options]
 Options:
   --chains <ids>     Comma-separated chain IDs (default: 8453,1)
   --methods <list>   Comma-separated methods (default: eth_sendTransaction,personal_sign)
+  --profile <name>   Namespace profile from config/namespaces.json (default, minimal, full)
   --qr <path>        Generate QR code to file
-  --json             Output as JSON
+  --json             Output session info as JSON after connection
 ```
 
 ### `request-tx` - Request Transaction
 
 ```bash
-node scripts/wc-requester.js request-tx --to <address> --data <hex> --value <wei> --chain <id>
+node scripts/wc-requester.js request-tx --to <address> [--data <hex>] [--value <wei>] [--chain <id>] [--from <address>]
 ```
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `--to` | Yes | Recipient address |
+| `--data` | No | Transaction calldata (default: 0x) |
+| `--value` | No | Value in wei (default: 0) |
+| `--chain` | No | Chain ID (default: 8453) |
+| `--from` | No | Sender address (uses first available if omitted) |
 
 ### `request-sign` - Request Signature
 
 ```bash
-node scripts/wc-requester.js request-sign --message <text> --chain <id>
+node scripts/wc-requester.js request-sign --message <text> [--chain <id>] [--from <address>]
 # or for typed data
-node scripts/wc-requester.js request-sign --typed-data <json> --chain <id>
+node scripts/wc-requester.js request-sign --typed-data <json> [--chain <id>] [--from <address>]
 ```
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `--message` | Yes* | Message to sign (for personal_sign) |
+| `--typed-data` | Yes* | JSON typed data (for eth_signTypedData_v4) |
+| `--chain` | No | Chain ID (default: 8453) |
+| `--from` | No | Signer address (uses first available if omitted) |
+
+*One of `--message` or `--typed-data` is required.
 
 ### `sessions` - List Active Sessions
 

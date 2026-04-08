@@ -43,14 +43,25 @@ const DEFAULT_METADATA = {
   icons: process.env.WC_METADATA_ICONS?.split(',') || ['https://avatars.githubusercontent.com/u/1234567']
 };
 
-// Default namespaces
-const DEFAULT_NAMESPACES = {
+// Load namespaces from config file, fallback to hardcoded defaults
+const NAMESPACES_FILE = path.join(__dirname, '..', 'config', 'namespaces.json');
+let NAMESPACES_CONFIG;
+try {
+  NAMESPACES_CONFIG = JSON.parse(fs.readFileSync(NAMESPACES_FILE, 'utf8'));
+} catch {
+  NAMESPACES_CONFIG = null;
+}
+
+const DEFAULT_NAMESPACES = (NAMESPACES_CONFIG && NAMESPACES_CONFIG.default) || {
   eip155: {
     chains: ['eip155:8453', 'eip155:1'],  // Base, Ethereum
     methods: ['eth_sendTransaction', 'personal_sign', 'eth_signTypedData_v4'],
     events: ['accountsChanged', 'chainChanged']
   }
 };
+
+// Connection timeout (5 minutes)
+const CONNECT_TIMEOUT_MS = 5 * 60 * 1000;
 
 // ============================================================================
 // Utilities
@@ -138,17 +149,24 @@ class WalletConnectRequester {
   }
 
   async connect(options = {}) {
-    const chains = options.chains || ['8453', '1'];
-    const methods = options.methods || ['eth_sendTransaction', 'personal_sign'];
-    
-    // Build namespaces
-    const namespaces = {
-      eip155: {
-        chains: chains.map(id => `eip155:${id}`),
-        methods: methods,
-        events: ['accountsChanged', 'chainChanged']
-      }
-    };
+    let namespaces;
+
+    // If a named profile is requested and config was loaded, use it
+    if (options.profile && NAMESPACES_CONFIG && NAMESPACES_CONFIG[options.profile]) {
+      namespaces = NAMESPACES_CONFIG[options.profile];
+    } else {
+      const chains = options.chains || ['8453', '1'];
+      const methods = options.methods || ['eth_sendTransaction', 'personal_sign'];
+
+      // Build namespaces
+      namespaces = {
+        eip155: {
+          chains: chains.map(id => `eip155:${id}`),
+          methods: methods,
+          events: ['accountsChanged', 'chainChanged']
+        }
+      };
+    }
 
     const { uri, approval } = await this.client.connect({
       requiredNamespaces: namespaces
@@ -170,7 +188,12 @@ class WalletConnectRequester {
     console.log('⏳ Waiting for connection...\n');
 
     try {
-      const session = await approval();
+      const session = await Promise.race([
+        approval(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Connection timed out. No wallet connected within 5 minutes.')), CONNECT_TIMEOUT_MS)
+        )
+      ]);
       
       // Save session
       const sessions = loadSessions();
@@ -477,8 +500,9 @@ Options:
   connect:
     --chains <ids>      Comma-separated chain IDs (default: 8453,1)
     --methods <list>    Comma-separated methods (default: eth_sendTransaction,personal_sign)
+    --profile <name>    Namespace profile from config/namespaces.json (default, minimal, full)
     --qr <path>         Generate QR code to file
-    --json              Output as JSON
+    --json              Output session info as JSON after connection
 
   request-tx:
     --to <address>      Recipient address (required)
@@ -504,7 +528,7 @@ Environment Variables:
 
 Examples:
   # Connect to wallet
-  WC_PROJECT_ID=xxx node wc-requester.js connect --qr wallet.png
+  WC_PROJECT_ID=your_project_id node wc-requester.js connect --qr wallet.png
 
   # Request USDC transfer
   node wc-requester.js request-tx \\
@@ -543,13 +567,22 @@ async function main() {
   await requester.init();
 
   switch (command) {
-    case 'connect':
-      await requester.connect({
+    case 'connect': {
+      const session = await requester.connect({
         chains: options.chains?.split(','),
         methods: options.methods?.split(','),
-        qr: options.qr
+        qr: options.qr,
+        profile: options.profile
       });
+      if (options.json && session) {
+        console.log(JSON.stringify({
+          topic: session.topic,
+          accounts: session.namespaces.eip155.accounts,
+          peer: session.peer.metadata
+        }, null, 2));
+      }
       break;
+    }
 
     case 'request-tx':
       if (!options.to) {

@@ -11,7 +11,12 @@ const path = require('path');
 const CONFIG_DIR = path.join(process.env.HOME, '.walletconnect-requester');
 const SESSIONS_FILE = path.join(CONFIG_DIR, 'sessions.json');
 
-const projectId = process.env.WC_PROJECT_ID || 'ee1a6e6d82ab82fab5130e5b8eaf5f73';
+const projectId = process.env.WC_PROJECT_ID;
+if (!projectId) {
+  console.error('❌ Error: WC_PROJECT_ID environment variable is required.');
+  console.error('Get your project ID at: https://cloud.walletconnect.com');
+  process.exit(1);
+}
 
 const METADATA = {
   name: 'AI Agent Requester',
@@ -48,7 +53,8 @@ async function main() {
   console.log('='.repeat(60));
 
   // Generate QR code
-  const qrPath = '/home/admin/.openclaw/workspace/wc_final.png';
+  const os = require('os');
+  const qrPath = process.env.WC_QR_PATH || path.join(os.tmpdir(), 'wc_connect_qr.png');
   await QRCode.toFile(qrPath, uri, { width: 400, margin: 2 });
   console.log(`\nQR code saved to: ${qrPath}`);
   console.log('\n📱 Scan with MetaMask and approve connection...');
