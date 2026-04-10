@@ -59,6 +59,12 @@ This is the safest way for AI agents to interact with Web3.
 openclaw skill install https://github.com/AntalphaAI/walletconnect-requester
 ```
 
+#### Install via ClawHub
+
+```bash
+clawhub install walletconnect-requester
+```
+
 #### Step 2: Install Node.js Dependencies
 
 > ⚠️ Node.js 18+ is required. Check with `node --version`.
