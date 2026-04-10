@@ -61,8 +61,10 @@ openclaw skill install https://github.com/AntalphaAI/walletconnect-requester
 
 #### Step 2: Install Node.js Dependencies
 
+> ⚠️ Node.js 18+ is required. Check with `node --version`.
+
 ```bash
-npm install @walletconnect/sign-client @walletconnect/core qrcode
+npm install @walletconnect/sign-client@2.23.9 @walletconnect/core@2.23.9 qrcode@1.5.4
 ```
 
 #### Step 3: Get WalletConnect Project ID
@@ -350,8 +352,10 @@ openclaw skill install https://github.com/AntalphaAI/walletconnect-requester
 
 #### 第二步：安装 Node.js 依赖
 
+> ⚠️ 需要 Node.js 18+，运行 `node --version` 确认版本。
+
 ```bash
-npm install @walletconnect/sign-client @walletconnect/core qrcode
+npm install @walletconnect/sign-client@2.23.9 @walletconnect/core@2.23.9 qrcode@1.5.4
 ```
 
 #### 第三步：获取 WalletConnect Project ID
