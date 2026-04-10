@@ -356,6 +356,12 @@ MIT — Built with security as the #1 priority.
 openclaw skill install https://github.com/AntalphaAI/walletconnect-requester
 ```
 
+#### 通过 ClawHub 安装
+
+```bash
+clawhub install walletconnect-requester
+```
+
 #### 第二步：安装 Node.js 依赖
 
 > ⚠️ 需要 Node.js 18+，运行 `node --version` 确认版本。
