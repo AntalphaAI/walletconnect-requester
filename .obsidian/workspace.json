@@ -18,22 +18,6 @@
             }
           }
         ]
-      },
-      {
-        "id": "a60455d9a23dd30d",
-        "type": "tabs",
-        "children": [
-          {
-            "id": "7aa2b1e120478e4c",
-            "type": "leaf",
-            "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "关系图谱"
-            }
-          }
-        ]
       }
     ],
     "direction": "vertical"
@@ -166,21 +150,30 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "欢迎.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "欢迎 的大纲"
+              "title": "大纲"
+            }
+          },
+          {
+            "id": "c6a3fd21f257f735",
+            "type": "leaf",
+            "state": {
+              "type": "git-view",
+              "state": {},
+              "icon": "git-pull-request",
+              "title": "Source Control"
             }
           }
-        ]
+        ],
+        "currentTab": 5
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -190,17 +183,18 @@
       "daily-notes:打开/创建今天的日记": false,
       "templates:插入模板": false,
       "command-palette:打开命令面板": false,
-      "bases:新建数据库": false
+      "bases:新建数据库": false,
+      "obsidian-git:Open Git source control": false
     }
   },
-  "active": "8360294be7380e2a",
+  "active": "c6a3fd21f257f735",
   "lastOpenFiles": [
+    "欢迎.md",
     "99_Attachments",
     "88_Templates",
     "30_Resources",
     "20_Knowledge",
     "10_Projects",
-    "00_Inbox",
-    "欢迎.md"
+    "00_Inbox"
   ]
 }
