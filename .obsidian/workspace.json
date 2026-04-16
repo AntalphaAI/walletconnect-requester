@@ -78,8 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "right": {
     "id": "681eb53d5d0a7167",
@@ -173,9 +172,19 @@
               "icon": "git-pull-request",
               "title": "Source Control"
             }
+          },
+          {
+            "id": "e85bc735b1c20390",
+            "type": "leaf",
+            "state": {
+              "type": "copilot-chat-view",
+              "state": {},
+              "icon": "message-square",
+              "title": "Copilot"
+            }
           }
         ],
-        "currentTab": 4
+        "currentTab": 6
       }
     ],
     "direction": "horizontal",
@@ -190,11 +199,29 @@
       "templates:插入模板": false,
       "command-palette:打开命令面板": false,
       "bases:新建数据库": false,
-      "obsidian-git:Open Git source control": false
+      "obsidian-git:Open Git source control": false,
+      "copilot:Open Copilot Chat": false
     }
   },
-  "active": "308510ea5507666c",
+  "active": "e85bc735b1c20390",
   "lastOpenFiles": [
+    "copilot/copilot-custom-prompts/Clip Web Page.md",
+    "copilot/copilot-custom-prompts/Clip YouTube Transcript.md",
+    "copilot/copilot-custom-prompts/Rewrite as tweet thread.md",
+    "copilot/copilot-custom-prompts/Rewrite as tweet.md",
+    "copilot/copilot-custom-prompts/Remove URLs.md",
+    "copilot/copilot-custom-prompts/Generate glossary.md",
+    "copilot/copilot-custom-prompts/Generate table of contents.md",
+    "copilot/copilot-custom-prompts/Make longer.md",
+    "copilot/copilot-custom-prompts/Make shorter.md",
+    "copilot/copilot-custom-prompts/Emojify.md",
+    "copilot/copilot-custom-prompts/Explain like I am 5.md",
+    "copilot/copilot-custom-prompts/Simplify.md",
+    "copilot/copilot-custom-prompts/Summarize.md",
+    "copilot/copilot-custom-prompts/Translate to Chinese.md",
+    "copilot/copilot-custom-prompts/Fix grammar and spelling.md",
+    "copilot/copilot-custom-prompts",
+    "copilot",
     "reports/antalpha-worldcup-campaign-20260415-brief.md",
     "10_Projects/antalpha-ai-业务汇报（含世界杯营销）-v2.4.1.md",
     "reports/antalpha-worldcup-campaign-20260415.md",
@@ -206,21 +233,6 @@
     "reports/web3-investor-v3.7-review.md",
     "reports/web3-investor-completion-summary-20260413.md",
     "reports/macro_analysis_2026-04-13.md",
-    "reports/macro_analysis_2026-04-06.md",
-    "reports/macro_analysis_2026-03-30.md",
-    "reports/macro_analysis_2026-03-23.md",
-    "reports/macro_analysis_2026-03-16.md",
-    "reports/macro_analysis_2026-03-09.md",
-    "reports/macro_analysis_2026-03-02.md",
-    "reports/macro_analysis_2026-02-27.md",
-    "reports/intimacy-economy-subagent-research.md",
-    "reports/discord_summary_2026-03-24.md",
-    "reports/bitcoin_macro_report_2026-03-24_beautified.md",
-    "reports/bitcoin_macro_report_2026-03-24.md",
-    "reports/antalpha-social-media-ops-20260413.md",
-    "reports/antalpha-interactive-demo-prd-cn-20260413.md",
-    "reports/antalpha-interactive-demo-prd-20260413.md",
-    "reports/antalpha-gtm-strategy-20260413.md",
     "reports",
     "docs",
     "99_Attachments",
