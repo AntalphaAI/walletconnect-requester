@@ -1,0 +1,310 @@
+"use strict";
+/**
+ * Model Router Plugin
+ *
+ * Routes every request based on prompt analysis.
+ * Only skips when user has manually set a non-auto override.
+ * Tracks actual model used via llm_input hook.
+ */
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = register;
+const child_process_1 = require("child_process");
+const path = __importStar(require("path"));
+const fs = __importStar(require("fs"));
+const ROUTER_PATH = path.join(process.env.HOME || '/home/admin', '.openclaw/workspace/tools/model-router/router.js');
+const MODEL_STATUS_PATH = path.join(process.env.HOME || '/home/admin', '.openclaw/workspace/tools/model-router/.last-model.json');
+const MODEL_FAILURES_PATH = path.join(process.env.HOME || '/home/admin', '.openclaw/workspace/tools/model-router/.model-failures.json');
+const SESSION_STORE_MARKER = 'model-router-auto';
+function readGlobalFailureRecord(provider) {
+    try {
+        if (!fs.existsSync(MODEL_FAILURES_PATH))
+            return false;
+        const content = fs.readFileSync(MODEL_FAILURES_PATH, 'utf-8');
+        const failures = JSON.parse(content);
+        const entry = failures[provider];
+        if (!entry)
+            return false;
+        const age = Date.now() - new Date(entry.timestamp).getTime();
+        return age < 60 * 1000;
+    }
+    catch {
+        return false;
+    }
+}
+function writeGlobalFailureRecord(provider, modelId) {
+    try {
+        let failures = {};
+        if (fs.existsSync(MODEL_FAILURES_PATH)) {
+            const content = fs.readFileSync(MODEL_FAILURES_PATH, 'utf-8');
+            failures = JSON.parse(content);
+        }
+        failures[provider] = { timestamp: new Date().toISOString(), provider, modelId };
+        const tempPath = MODEL_FAILURES_PATH + '.tmp';
+        fs.writeFileSync(tempPath, JSON.stringify(failures, null, 2), { encoding: 'utf-8', mode: 0o664 });
+        fs.renameSync(tempPath, MODEL_FAILURES_PATH);
+    }
+    catch {
+        // silent fail
+    }
+}
+/**
+ * Read session override to check if model-router has already set an override
+ */
+function readSessionOverride(sessionKey, agentId) {
+    try {
+        const sessionStorePath = path.join(process.env.HOME || '/home/admin', '.openclaw/agents', agentId, 'sessions/sessions.json');
+        if (!fs.existsSync(sessionStorePath))
+            return null;
+        const content = fs.readFileSync(sessionStorePath, 'utf-8');
+        const store = JSON.parse(content);
+        const entry = store[sessionKey];
+        if (!entry || !entry.providerOverride || !entry.modelOverride)
+            return null;
+        const isAutoRouter = entry._modelRouterMarker === SESSION_STORE_MARKER;
+        let isRecentFailure = readGlobalFailureRecord(entry.providerOverride);
+        if (entry._modelRouterLastFailed && entry._modelRouterLastFailedProvider === entry.providerOverride) {
+            const failureAge = Date.now() - new Date(entry._modelRouterLastFailed).getTime();
+            isRecentFailure = failureAge < 60 * 1000;
+        }
+        return {
+            provider: entry.providerOverride,
+            model: entry.modelOverride,
+            isAutoRouter,
+            isRecentFailure
+        };
+    }
+    catch {
+        return null;
+    }
+}
+/**
+ * Write session override to persist model's routing decision
+ */
+function writeSessionOverride(sessionKey, agentId, provider, model, alias) {
+    try {
+        const sessionStoreDir = path.join(process.env.HOME || '/home/admin', '.openclaw/agents', agentId, 'sessions');
+        const sessionStorePath = path.join(sessionStoreDir, 'sessions.json');
+        if (!fs.existsSync(sessionStoreDir)) {
+            fs.mkdirSync(sessionStoreDir, { recursive: true });
+        }
+        let store = {};
+        if (fs.existsSync(sessionStorePath)) {
+            const content = fs.readFileSync(sessionStorePath, 'utf-8');
+            store = JSON.parse(content);
+        }
+        if (!store[sessionKey]) {
+            store[sessionKey] = {};
+        }
+        store[sessionKey].providerOverride = provider;
+        store[sessionKey].modelOverride = model;
+        store[sessionKey]._modelRouterMarker = SESSION_STORE_MARKER;
+        store[sessionKey]._modelRouterAlias = alias;
+        const tempPath = sessionStorePath + '.tmp';
+        fs.writeFileSync(tempPath, JSON.stringify(store, null, 2), { encoding: 'utf-8', mode: 0o664 });
+        fs.renameSync(tempPath, sessionStorePath);
+        return true;
+    }
+    catch (e) {
+        console.error('[model-router] Failed to write session override:', e.message);
+        return false;
+    }
+}
+/**
+ * Write a failure marker for a model that just failed auth
+ */
+function writeFailedModelMarker(sessionKey, agentId, provider) {
+    try {
+        const sessionStoreDir = path.join(process.env.HOME || '/home/admin', '.openclaw/agents', agentId, 'sessions');
+        const sessionStorePath = path.join(sessionStoreDir, 'sessions.json');
+        if (!fs.existsSync(sessionStoreDir)) {
+            fs.mkdirSync(sessionStoreDir, { recursive: true });
+        }
+        let store = {};
+        if (fs.existsSync(sessionStorePath)) {
+            const content = fs.readFileSync(sessionStorePath, 'utf-8');
+            store = JSON.parse(content);
+        }
+        if (!store[sessionKey]) {
+            store[sessionKey] = {};
+        }
+        store[sessionKey]._modelRouterLastFailed = new Date().toISOString();
+        store[sessionKey]._modelRouterLastFailedProvider = provider;
+        const tempPath = sessionStorePath + '.tmp';
+        fs.writeFileSync(tempPath, JSON.stringify(store, null, 2), { encoding: 'utf-8', mode: 0o664 });
+        fs.renameSync(tempPath, sessionStorePath);
+        return true;
+    }
+    catch (e) {
+        console.error('[model-router] Failed to write failure marker:', e.message);
+        return false;
+    }
+}
+/**
+ * Clear session override (used when a model has recently failed)
+ */
+function clearSessionOverride(sessionKey, agentId) {
+    try {
+        const sessionStoreDir = path.join(process.env.HOME || '/home/admin', '.openclaw/agents', agentId, 'sessions');
+        const sessionStorePath = path.join(sessionStoreDir, 'sessions.json');
+        if (!fs.existsSync(sessionStorePath))
+            return true;
+        const content = fs.readFileSync(sessionStorePath, 'utf-8');
+        const store = JSON.parse(content);
+        if (!store[sessionKey])
+            return true;
+        delete store[sessionKey].providerOverride;
+        delete store[sessionKey].modelOverride;
+        delete store[sessionKey]._modelRouterMarker;
+        delete store[sessionKey]._modelRouterAlias;
+        const tempPath = sessionStorePath + '.tmp';
+        fs.writeFileSync(tempPath, JSON.stringify(store, null, 2), { encoding: 'utf-8', mode: 0o664 });
+        fs.renameSync(tempPath, sessionStorePath);
+        return true;
+    }
+    catch (e) {
+        console.error('[model-router] Failed to clear session override:', e.message);
+        return false;
+    }
+}
+/**
+ * Write actual model used to status file
+ * Called by llm_input hook with the actual model (after OpenClaw's fallback decisions)
+ */
+function writeActualModelStatus(provider, model, alias, api) {
+    try {
+        const dir = path.dirname(MODEL_STATUS_PATH);
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        const data = {
+            provider,
+            modelId: model,
+            alias: alias || model,
+            timestamp: new Date().toISOString()
+        };
+        const tempPath = MODEL_STATUS_PATH + '.tmp';
+        fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), { encoding: 'utf-8', mode: 0o664 });
+        fs.renameSync(tempPath, MODEL_STATUS_PATH);
+        api.logger.info(`[model-router] Actual model: ${alias || model} (${provider}/${model})`);
+        return true;
+    }
+    catch (e) {
+        api.logger.error(`[model-router] Failed to write status file: ${e.message}`);
+        return false;
+    }
+}
+/**
+ * Call the router module to get recommended model
+ */
+function getRecommendedModelFull(prompt) {
+    try {
+        const escapedPrompt = prompt.replace(/'/g, "'\\''").substring(0, 2000);
+        const result = (0, child_process_1.execSync)(`node "${ROUTER_PATH}" '${escapedPrompt}' --full --json`, {
+            encoding: 'utf-8',
+            timeout: 5000,
+            cwd: path.dirname(ROUTER_PATH),
+            stdio: ['pipe', 'pipe', 'pipe']
+        });
+        const parsed = JSON.parse(result.trim());
+        if (parsed.model_sequence && parsed.model_sequence.length > 0) {
+            return parsed.model_sequence[0];
+        }
+        return null;
+    }
+    catch (error) {
+        console.error('[model-router] Error calling router:', error);
+        return null;
+    }
+}
+/**
+ * Plugin registration
+ */
+function register(api) {
+    api.logger.info('[model-router] Plugin loaded - registering hooks');
+    api.on('before_model_resolve', async (event, ctx) => {
+        const sessionKey = ctx?.sessionKey;
+        const agentId = ctx?.agentId || 'main';
+        api.logger.info('[model-router] before_model_resolve triggered');
+        const prompt = event?.prompt || '';
+        if (!prompt || prompt.length < 5) {
+            api.logger.info('[model-router] Prompt too short, skipping');
+            return undefined;
+        }
+        const existingOverride = readSessionOverride(sessionKey, agentId);
+        if (existingOverride && !existingOverride.isAutoRouter) {
+            api.logger.info(`[model-router] User-set override (${existingOverride.provider}/${existingOverride.model}), skipping`);
+            return undefined;
+        }
+        // If auto-router's model recently failed auth, clear it and let fallback proceed
+        if (existingOverride && existingOverride.isAutoRouter && existingOverride.isRecentFailure) {
+            api.logger.info(`[model-router] Auto-router model recently failed auth (${existingOverride.provider}/${existingOverride.model}), clearing override`);
+            clearSessionOverride(sessionKey, agentId);
+            return undefined;
+        }
+        const modelInfo = getRecommendedModelFull(prompt);
+        if (modelInfo) {
+            api.logger.info(`[model-router] Routing: ${modelInfo.provider}/${modelInfo.modelId} (${modelInfo.alias})`);
+            const writeSessionOk = writeSessionOverride(sessionKey, agentId, modelInfo.provider, modelInfo.modelId, modelInfo.alias);
+            if (!writeSessionOk) {
+                api.logger.error('[model-router] WARNING: Failed to write session override');
+            }
+            return {
+                providerOverride: modelInfo.provider,
+                modelOverride: modelInfo.modelId
+            };
+        }
+        api.logger.info('[model-router] No recommendation from router');
+        return undefined;
+    });
+    api.on('llm_input', async (event, ctx) => {
+        const sessionKey = ctx?.sessionKey;
+        const agentId = ctx?.agentId || 'main';
+        const provider = event.provider;
+        const model = event.model;
+        if (!provider || !model) {
+            api.logger.warn('[model-router] llm_input missing provider/model');
+            return;
+        }
+        const errorStr = event.error || '';
+        if (errorStr) {
+            api.logger.info(`[model-router] Model failure detected for ${provider}/${model}: ${errorStr.substring(0, 100)}, recording global failure marker`);
+            writeFailedModelMarker(sessionKey, agentId, provider);
+            writeGlobalFailureRecord(provider, model);
+        }
+        writeActualModelStatus(provider, model, null, api);
+    });
+    api.logger.info('[model-router] Hooks registered successfully');
+}

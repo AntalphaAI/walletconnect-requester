@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "updatedAt": "2026-04-08T22:03:28.496Z",
+  "entries": {
+    "memory:memory/2026-03-04.md:1:12": {
+      "key": "memory:memory/2026-03-04.md:1:12",
+      "path": "memory/2026-03-04.md",
+      "startLine": 1,
+      "endLine": 12,
+      "source": "memory",
+      "snippet": "# 2026-03-04 记忆日志 ## 心跳检查记录 ### 18:03 邮件审批检查 【项目：邮件审批流程】智能审批助手心跳检查 结果：无待处理审批邮件 - Derar Islim：无新邮件 - Prime-预发环境：测试邮件，无需处理 - Elva Li 解除质押确认：丁丁已于17:34回复确认，流程完成 - Jira通知：系统通知，无需审批 检索标签：#邮件审批 #心跳检查 #无待办",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "totalScore": 1.1148825347423554,
+      "maxScore": 0.5574683770537376,
+      "firstRecalledAt": "2026-04-08T10:03:27.449Z",
+      "lastRecalledAt": "2026-04-08T22:03:28.496Z",
+      "queryHashes": [
+        "b9781b461db2",
+        "2fb9a9b6b08c"
+      ],
+      "recallDays": [
+        "2026-04-08",
+        "2026-04-09"
+      ],
+      "conceptTags": [
+        "prime-预发环境",
+        "记忆",
+        "日志",
+        "心跳",
+        "检查",
+        "记录",
+        "邮件",
+        "审批"
+      ]
+    },
+    "memory:memory/2026-03-24.md:1:74": {
+      "key": "memory:memory/2026-03-24.md:1:74",
+      "path": "memory/2026-03-24.md",
+      "startLine": 1,
+      "endLine": 74,
+      "source": "memory",
+      "snippet": "# 2026-03-24 日志 ## 邮件审批检查 (00:03) ### 检查结果 **扫描范围**：最近1天内包含\"审批/审核/确认\"关键词的邮件 #### ✅ 已完成审批（无需处理） **1. DL HODL Limited & DL HODL Inc 联合质押监控审批** - 邮件线程：19d18d503db6632d - 发起人：Laurel LI (2026-03-23 11:54) - 审批链： - 风控 (risk.approval04)：✅ 无异议 (2026-03-23 15:00) - 业务 (Dean Peng)：✅ 确认 (2026-03-23 18:05) - Derar Islim：✅ OK (2026-03-23 18:53) - **状态：审批流程已完成** - 备注：丁丁作为 primeorder 组成员收到通知，无需直接审批 #### 📋 其他邮件（非审批类） - 多封 JIRA 工单通知（托管费用结算）- 系统自动通知 - 电费贷放款审核相关 - 流程性通知 ### 结论 本次检查未发现需要丁丁处理的待审批邮件。 检索标签：#邮件审批 #定时任务 #heartbeat --- ## 邮件审批检查 (18:03) ### 检查结果 **扫描范围**：最近1天内包含\"审批/审核/确认\"关键词的邮件（6封） #### ✅ 已完成审批 **1. Flowdesk 质押借贷 ZYJDG00201 - 250,000 USDT** - 邮件线程：19d1de31689f8bc4 - 发起人：Antalph",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "totalScore": 1.099586310982704,
+      "maxScore": 0.5501558870077132,
+      "firstRecalledAt": "2026-04-08T10:03:27.449Z",
+      "lastRecalledAt": "2026-04-08T22:03:28.496Z",
+      "queryHashes": [
+        "b9781b461db2",
+        "2fb9a9b6b08c"
+      ],
+      "recallDays": [
+        "2026-04-08",
+        "2026-04-09"
+      ],
+      "conceptTags": [
+        "审批/审核/确认",
+        "risk.approval04",
+        "日志",
+        "邮件",
+        "审批",
+        "检查",
+        "结果",
+        "扫描"
+      ]
+    },
+    "memory:memory/2026-03-03.md:1:29": {
+      "key": "memory:memory/2026-03-03.md:1:29",
+      "path": "memory/2026-03-03.md",
+      "startLine": 1,
+      "endLine": 29,
+      "source": "memory",
+      "snippet": "# 2026-03-03 日志 ## 心跳任务记录 ### 邮件审批检查 (18:03) **检查结果：发现2封需要处理的邮件** #### 1. 付款申请 - 待审批 🔴 - 邮件ID：19cb232703e2167f - 主题：【付款申请】Alpha Digital Holding, Inc. 矿机贷方案二KJD00701电费贷增资 - 金额：46,189.18 USDT - 审批ID：APPD-DZHJD20260303011857 - 审批进度： - ✅ 财务审批：已通过（Adonis Chan） - ⏳ 业务leader审批：**等待丁丁审批** - ⏸️ 金总审批：未达节点 - 状态：已通知主人 #### 2. 合同签署确认 - 需检查 🟡 - 邮件ID：19cb27178bf633d8 - 主题：【合同签署前确认】Valley Point International Limited - 质押借贷业务 ZYJD03511 - 内容：客户要求修改风控人及更新白名单地址 - 合同号：ZYJD03511 & ZYJD03513 - 状态：已通知主人 --- 检索标签：#邮件审批 #心跳任务",
+      "recallCount": 2,
+      "dailyCount": 0,
+      "totalScore": 1.0986328095197675,
+      "maxScore": 0.5502646595239639,
+      "firstRecalledAt": "2026-04-08T10:03:27.449Z",
+      "lastRecalledAt": "2026-04-08T22:03:28.496Z",
+      "queryHashes": [
+        "b9781b461db2",
+        "2fb9a9b6b08c"
+      ],
+      "recallDays": [
+        "2026-04-08",
+        "2026-04-09"
+      ],
+      "conceptTags": [
+        "189.18",
+        "appd-dzhjd20260303011857",
+        "日志",
+        "心跳",
+        "任务",
+        "记录",
+        "邮件",
+        "审批"
+      ]
+    }
+  }
+}

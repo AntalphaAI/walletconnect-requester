@@ -1,0 +1,32 @@
+# ==========================================
+# 🛑 OpenClaw 全局索引黑名单 (防 IO 爆炸专供)
+# ==========================================
+
+# 1. 依赖包黑洞 (绝对的 IO 杀手，坚决不扫)
+node_modules/
+.pnpm-store/
+vendor/
+venv/
+.venv/
+
+# 2. 版本控制核心 (文件极碎，无业务价值)
+.git/
+.svn/
+
+# 3. 缓存与编译产物 (每次打包都会变，没必要记)
+.cache/
+dist/
+build/
+.next/
+out/
+coverage/
+
+# 4. 各种狂暴写入的日志文件
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# 5. 系统级临时文件
+tmp/
+temp/
+.DS_Store

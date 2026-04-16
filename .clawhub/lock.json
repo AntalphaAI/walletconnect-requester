@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "skills": {
+    "gmail": {
+      "version": "1.0.6",
+      "installedAt": 1771919825265
+    },
+    "gog": {
+      "version": "1.0.0",
+      "installedAt": 1771923390615
+    },
+    "ontology": {
+      "version": "0.1.2",
+      "installedAt": 1771923736713
+    },
+    "tavily-search": {
+      "version": "1.0.0",
+      "installedAt": 1771924826240
+    },
+    "summarize": {
+      "version": "1.0.0",
+      "installedAt": 1771924844739
+    },
+    "weather": {
+      "version": "1.0.0",
+      "installedAt": 1771924868218
+    },
+    "openai-whisper": {
+      "version": "1.0.0",
+      "installedAt": 1771924893446
+    },
+    "telegram-offline-voice": {
+      "version": "0.1.3",
+      "installedAt": 1771931367050
+    },
+    "agent-browser": {
+      "version": "0.2.0",
+      "installedAt": 1771934228628
+    },
+    "find-skills": {
+      "version": "0.1.0",
+      "installedAt": 1772175165992
+    },
+    "serpapi": {
+      "version": "1.0.0",
+      "installedAt": 1772175436347
+    },
+    "polymarket-api": {
+      "version": "1.0.0",
+      "installedAt": 1772176372115
+    },
+    "skill-vetter": {
+      "version": "1.0.0",
+      "installedAt": 1772441521852
+    },
+    "playwright-mcp": {
+      "version": "1.0.0",
+      "installedAt": 1772441768567
+    },
+    "token-manager": {
+      "version": "1.2.0",
+      "installedAt": 1772456665064
+    },
+    "relationship-skills": {
+      "version": "1.0.0",
+      "installedAt": 1772460934059
+    },
+    "git": {
+      "version": "1.0.7",
+      "installedAt": 1772531699403
+    },
+    "qrcode-gen-yn": {
+      "version": "1.1.1",
+      "installedAt": 1772706308207
+    },
+    "skill-creator": {
+      "version": "0.1.0",
+      "installedAt": 1772722768024
+    },
+    "self-improving-agent": {
+      "version": "1.0.11",
+      "installedAt": 1772897930975
+    },
+    "notion": {
+      "version": "1.0.0",
+      "installedAt": 1772900721236
+    },
+    "cosyvoice3-macos": {
+      "version": "1.0.0",
+      "installedAt": 1773219296977
+    },
+    "memory-setup-openclaw": {
+      "version": "1.0.0",
+      "installedAt": 1773381677647
+    },
+    "memory-hygiene": {
+      "version": "1.0.0",
+      "installedAt": 1773381738191
+    },
+    "nutrition": {
+      "version": "1.0.0",
+      "installedAt": 1773801341564
+    },
+    "fitness": {
+      "version": "1.0.1",
+      "installedAt": 1773801341822
+    },
+    "health": {
+      "version": "1.0.1",
+      "installedAt": 1773801341960
+    },
+    "personal-health-manager": {
+      "version": "1.0.0",
+      "installedAt": 1773801342315
+    },
+    "sleep-tracker": {
+      "version": "2.0.0",
+      "installedAt": 1773801353374
+    },
+    "human-writing": {
+      "version": "1.0.0",
+      "installedAt": 1773830914576
+    },
+    "Mcporter": {
+      "version": "1.0.0",
+      "installedAt": 1774605487211
+    },
+    "bilibili-subtitle-download-skill": {
+      "version": "1.0.0",
+      "installedAt": 1775206088389
+    },
+    "deerflow": {
+      "version": "1.0.1",
+      "installedAt": 1775324179814
+    },
+    "wallet-guard": {
+      "version": "1.0.0",
+      "installedAt": 1776148687142
+    }
+  }
+}

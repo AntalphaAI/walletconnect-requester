@@ -1,0 +1,9 @@
+{
+  "taskType": "code",
+  "model": {
+    "provider": "bailian",
+    "modelId": "kimi-k2.5",
+    "alias": "Kimi-BL"
+  },
+  "timestamp": "2026-03-31T10:56:24.956Z"
+}

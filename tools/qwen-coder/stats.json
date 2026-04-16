@@ -1,0 +1,73 @@
+{
+  "version": "1.0.0",
+  "description": "Qwen Coder 执行统计与强化学习数据",
+  "lastUpdated": "2026-03-06T04:46:59.373Z",
+  "executionHistory": [],
+  "taskTypeStats": {
+    "simple": {
+      "name": "简单任务",
+      "examples": [
+        "创建文件",
+        "小修改",
+        "单行代码"
+      ],
+      "executions": [],
+      "p50": null,
+      "p90": null,
+      "p99": null,
+      "avgDuration": null,
+      "successRate": null,
+      "recommendedTimeout": 300000
+    },
+    "medium": {
+      "name": "中等任务",
+      "examples": [
+        "单个模块",
+        "API开发",
+        "函数实现"
+      ],
+      "executions": [
+        {
+          "timestamp": "2026-03-06T04:46:59.373Z",
+          "model": "glm-5",
+          "duration": 40607,
+          "success": true
+        }
+      ],
+      "p50": 40607,
+      "p90": 40607,
+      "p99": null,
+      "avgDuration": 40607,
+      "successRate": 1,
+      "recommendedTimeout": 900000
+    },
+    "complex": {
+      "name": "复杂任务",
+      "examples": [
+        "搭建项目",
+        "重构代码",
+        "多模块系统"
+      ],
+      "executions": [],
+      "p50": null,
+      "p90": null,
+      "p99": null,
+      "avgDuration": null,
+      "successRate": null,
+      "recommendedTimeout": 1800000
+    }
+  },
+  "modelPerformance": {},
+  "learning": {
+    "totalExecutions": 1,
+    "successfulExecutions": 1,
+    "failedExecutions": 0,
+    "timeoutExecutions": 0,
+    "averageImprovementRate": 0
+  },
+  "progressObservation": {
+    "enabled": true,
+    "checkInterval": 60000,
+    "maxChecksWithoutOutput": 5
+  }
+}

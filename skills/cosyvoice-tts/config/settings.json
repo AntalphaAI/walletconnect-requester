@@ -1,0 +1,12 @@
+{
+  "api_key": "sk-lsqlkhstzktnlaoshdgqlijwygcbynlyxtmsdbvaatxciuoc",
+  "model": "FunAudioLLM/CosyVoice2-0.5B",
+  "base_url": "https://api.siliconflow.cn/v1",
+  "default_voice": "FunAudioLLM/CosyVoice2-0.5B:claire",
+  "default_format": "mp3",
+  "default_speed": 1.0,
+  "custom_voices": {
+    "jujingyi": "speech:jujingyi:d6f9hrtsssvc73aopokg:zqrxrsbpqfdphaygxpri",
+    "jujingyi_v2": "speech:jujingyi_v2:d6f9hrtsssvc73aopokg:fhcfqzstizvjzbpegaar"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "id": "model-router",
+  "name": "Model Router",
+  "description": "Intelligent model routing based on input characteristics",
+  "version": "1.0.0",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  },
+  "openclaw": {
+    "extensions": ["./index.ts"]
+  }
+}

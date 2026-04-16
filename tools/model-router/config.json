@@ -1,0 +1,193 @@
+{
+  "version": "4.0.0",
+  "description": "模型路由器 v4 - 维度扩展 + 置信度 + Agentic + Profile",
+  
+  "stability": {
+    "strict_validation": true,
+    "auto_fallback": true,
+    "never_throw": true,
+    "max_input_length": 100000,
+    "emergency_fallback": {
+      "provider": "bailian",
+      "modelId": "glm-5",
+      "alias": "GLM5-BL"
+    }
+  },
+  
+  "blocked_models": [
+    "gemini*",
+    "google/*",
+    "Gemini-Flash",
+    "Gemini-Pro"
+  ],
+  
+  "model_aliases": {
+    "_comment": "路由规则中使用的短别名 → OpenClaw 系统模型别名（agents.defaults.models 中的 alias）",
+    "kimi": "Kimi-BL",
+    "glm": "GLM5-BL",
+    "glm47": "GLM47-BL",
+    "qwen": "Qwen35",
+    "qwen_coder": "QwenCoderPlus",
+    "qwen_max": "QwenMax",
+    "kimi_original": "Kimi",
+    "glm_original": "GLM",
+    "minimax": "Minimax",
+    "mimo": "MiMo"
+  },
+  
+  "routing_rules": [
+    {
+      "name": "user_specified",
+      "priority": 1,
+      "description": "用户明确指定模型时，无条件使用该模型",
+      "condition": { "user_model_specified": true },
+      "action": { "use_user_model": true }
+    },
+    {
+      "name": "multimodal_vision",
+      "priority": 2,
+      "description": "图像理解任务，首选 Kimi（视觉能力强）",
+      "condition": { "has_image": true },
+      "action": { "model_sequence": ["kimi", "qwen", "kimi_original"] }
+    },
+    {
+      "name": "code_generation",
+      "priority": 3,
+      "description": "代码生成任务，首选 GLM-5",
+      "condition": { "task_type": "code" },
+      "action": { "model_sequence": ["glm", "qwen_coder", "glm_original"] }
+    },
+    {
+      "name": "complex_reasoning",
+      "priority": 4,
+      "description": "复杂推理分析，首选 GLM-5",
+      "condition": { "task_type": "reasoning", "complexity": "high" },
+      "action": { "model_sequence": ["glm", "qwen_max", "glm_original"] }
+    },
+    {
+      "name": "reasoning_moderate",
+      "priority": 5,
+      "description": "中等推理任务，首选 GLM-5",
+      "condition": { "task_type": "reasoning" },
+      "action": { "model_sequence": ["glm", "kimi", "glm_original"] }
+    },
+    {
+      "name": "translation",
+      "priority": 6,
+      "description": "翻译任务，首选 Kimi（多语言能力强）",
+      "condition": { "task_type": "translation" },
+      "action": { "model_sequence": ["kimi", "glm", "kimi_original"] }
+    },
+    {
+      "name": "long_context",
+      "priority": 7,
+      "description": "超长文本任务（>50万token），使用 MiMo（100万上下文，真1M）",
+      "condition": { "estimated_tokens": ">500k" },
+      "action": { "model_sequence": ["mimo", "qwen", "qwen_coder", "kimi"] }
+    },
+    {
+      "name": "quick_response",
+      "priority": 8,
+      "description": "快速响应，使用轻量模型",
+      "condition": { "text_length": "short", "complexity": "low" },
+      "action": { "model_sequence": ["kimi", "glm47", "glm"] }
+    },
+    {
+      "name": "general_chat",
+      "priority": 10,
+      "description": "通用对话，首选 Kimi",
+      "condition": { "task_type": "general" },
+      "action": { "model_sequence": ["kimi", "glm", "kimi_original"] }
+    },
+    {
+      "name": "default_fallback",
+      "priority": 99,
+      "description": "默认回退规则，使用 Kimi",
+      "condition": {},
+      "action": { "model_sequence": ["kimi", "glm", "kimi_original", "glm_original"] }
+    }
+  ],
+  
+  "task_keywords": {
+    "code": [
+      "代码", "code", "编程", "写代码", "function", "class", "sql", "脚本",
+      "写一个", "写一个函数", "python", "java", "javascript", "算法", "实现",
+      "函数", "方法", "程序", "bug", "修复", "重构", "debug", "编译", "运行",
+      "API", "接口", "模块", "组件", "脚本", "自动化",
+      "后台", "服务器", "日志", "调试", "部署", "运维", "devops", "ssh", "linux",
+      "命令行", "shell", "bash", "docker", "k8s", "kubernetes", "nginx", "mysql",
+      "redis", "mongodb", "postgresql", "数据库", "缓存", "队列", "服务", "进程",
+      "线程", "并发", "性能", "优化", "排查", "报错", "错误", "异常", "stack",
+      "trace", "监控", "告警", "定时任务", "cron", "脚本执行", "环境配置"
+    ],
+    "reasoning": [
+      "分析", "analyze", "推理", "reasoning", "为什么", "why", "如何", "how",
+      "比较", "compare", "优缺点", "评估", "思考", "论证", "证明", "解释",
+      "原因", "逻辑", "推导", "结论", "判断", "决策", "方案", "建议",
+      "排查问题", "定位", "诊断", "根因", "影响", "风险", "利弊", "权衡",
+      "可能性", "假设", "验证", "思路", "策略", "规划", "设计", "架构",
+      "选型", "取舍", "场景", "背景", "意图", "目的", "意义"
+    ],
+    "translation": [
+      "翻译", "translate", "译为", "convert to", "英文", "中文", "日语", "韩语",
+      "英语", "中译", "英译", "翻成"
+    ],
+    "summarization": [
+      "总结", "summarize", "摘要", "概括", "归纳", "提炼", "要点", "核心"
+    ]
+  },
+  
+  "length_thresholds": {
+    "short": 200,
+    "medium": 500,
+    "long": 1000
+  },
+  
+  "profile": {
+    "default": "auto",
+    "available": ["auto", "eco", "premium", "coding"],
+    "descriptions": {
+      "auto": "平衡模式：质量/成本均衡",
+      "eco": "省钱模式：优先选择便宜模型",
+      "premium": "高质量模式：优先选择强模型",
+      "coding": "编程模式：优先选择代码能力强的模型"
+    }
+  },
+  
+  "fallback": {
+    "enabled": true,
+    "confidence_threshold": 0.5,
+    "model": "bailian/glm-4-flash",
+    "max_tokens": 10,
+    "temperature": 0,
+    "cache_ttl_ms": 3600000
+  },
+  
+  "v4": {
+    "dimensions": 12,
+    "confidence": {
+      "calibration": "sigmoid",
+      "threshold": 0.5
+    },
+    "tier_boundaries": {
+      "simple": -0.15,
+      "medium": 0.25,
+      "complex": 0.65,
+      "reasoning": 0.65
+    }
+  },
+  
+  "cache": {
+    "enabled": true,
+    "maxSize": 1000,
+    "ttl": 3600000
+  },
+  
+  "observability": {
+    "enabled": true,
+    "logLevel": "info",
+    "logToFile": true,
+    "metricsEnabled": true,
+    "slowRouteThresholdMs": 50
+  }
+}

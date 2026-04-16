@@ -1,0 +1,110 @@
+{
+  "version": "2.0.0",
+  "description": "Qwen Coder - 外包编程工具配置 (含强化学习反馈)",
+  
+  "defaultModel": "glm-5",
+  
+  "availableModels": [
+    {
+      "id": "glm-5",
+      "name": "[Bailian Coding Plan] glm-5",
+      "description": "智谱 GLM-5，综合能力强，适合通用编程任务",
+      "contextWindow": 202752,
+      "recommended": ["general", "reasoning", "debugging"]
+    },
+    {
+      "id": "qwen3-coder-plus",
+      "name": "[Bailian Coding Plan] qwen3-coder-plus",
+      "description": "通义千问编程专用，100万上下文，适合大型项目",
+      "contextWindow": 1000000,
+      "recommended": ["large-project", "code-review", "refactoring"]
+    },
+    {
+      "id": "qwen3.5-plus",
+      "name": "[Bailian Coding Plan] qwen3.5-plus",
+      "description": "通义千问3.5增强版，支持思考链",
+      "contextWindow": 1000000,
+      "recommended": ["complex-logic", "architecture"]
+    },
+    {
+      "id": "kimi-k2.5",
+      "name": "[Bailian Coding Plan] kimi-k2.5",
+      "description": "月之暗面 Kimi K2.5，多语言能力强",
+      "contextWindow": 262144,
+      "recommended": ["translation", "documentation"]
+    }
+  ],
+  
+  "timeoutTiers": {
+    "quick": {
+      "name": "快速模式",
+      "duration": 300000,
+      "description": "简单任务：创建文件、小修改、单行代码",
+      "adaptive": true
+    },
+    "standard": {
+      "name": "标准模式",
+      "duration": 900000,
+      "description": "中等任务：单个模块、API开发、函数实现",
+      "adaptive": true
+    },
+    "deep": {
+      "name": "深度模式",
+      "duration": 1800000,
+      "description": "复杂任务：搭建项目、重构代码、多模块系统",
+      "adaptive": true
+    }
+  },
+  
+  "execution": {
+    "defaultTier": "standard",
+    "maxRetries": 3,
+    "retryDelay": 1000,
+    "yoloMode": true,
+    "outputFormat": "text",
+    "debug": false
+  },
+  
+  "reinforcementLearning": {
+    "enabled": true,
+    "minSamplesForStats": 5,
+    "decayFactor": 0.9,
+    "adaptationRate": 0.1
+  },
+  
+  "progressObservation": {
+    "enabled": true,
+    "checkInterval": 60000,
+    "initialDelay": 30000,
+    "maxChecksWithoutOutput": 5,
+    "onProgressCallback": null
+  },
+  
+  "session": {
+    "persistSession": true,
+    "sessionDir": "~/.qwen/sessions",
+    "maxSessionAge": 86400000
+  },
+  
+  "logging": {
+    "enabled": true,
+    "logDir": "~/.openclaw/workspace/tools/qwen-coder/logs",
+    "logLevel": "info",
+    "maxLogSize": 10485760,
+    "maxLogFiles": 10
+  },
+  
+  "safety": {
+    "maxTaskLength": 50000,
+    "blockedPatterns": [
+      "rm -rf /",
+      "sudo rm",
+      "mkfs",
+      "dd if="
+    ],
+    "allowedDirectories": [
+      "~/.openclaw/workspace",
+      "/tmp"
+    ]
+  }
+}

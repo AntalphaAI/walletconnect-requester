@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "antalpha-rwa": {
+      "baseUrl": "https://mcp.prime.antalpha.com/mcp"
+    },
+    "antalpha-swap": {
+      "baseUrl": "https://mcp-skills.ai.antalpha.com/mcp"
+    },
+    "antalpha-skills": {
+      "baseUrl": "https://mcp-skills.ai.antalpha.com/mcp"
+    }
+  },
+  "imports": []
+}

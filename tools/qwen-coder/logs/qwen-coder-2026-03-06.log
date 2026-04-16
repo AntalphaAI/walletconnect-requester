@@ -1,0 +1,10 @@
+{"timestamp":"2026-03-06T03:17:53.148Z","level":"info","message":"开始执行任务","data":{"taskId":"task-1772767073148-nxs3vfnmx","taskLength":71}}
+{"timestamp":"2026-03-06T03:17:53.149Z","level":"info","message":"执行选项","data":{"taskId":"task-1772767073148-nxs3vfnmx","options":{"model":"glm-5","timeout":60000,"yolo":true,"outputFormat":"text","debug":false,"continue":false,"sessionId":null,"workdir":"/home/admin/.openclaw/workspace"}}}
+{"timestamp":"2026-03-06T03:17:53.149Z","level":"info","message":"命令参数","data":{"taskId":"task-1772767073148-nxs3vfnmx","args":["在当前目录创建一个名为 test_hello.js 的文件，内容是 console.log(\"Hello from Qwen Coder!\")","-y","-m","glm-5","-o","text"]}}
+{"timestamp":"2026-03-06T03:18:28.021Z","level":"info","message":"任务完成","data":{"taskId":"task-1772767073148-nxs3vfnmx","exitCode":0,"outputLength":23}}
+{"timestamp":"2026-03-06T04:46:18.763Z","level":"info","message":"开始执行任务 [medium]","data":{"taskId":"task-1772772378762-zkg8xw2ps","taskLength":124}}
+{"timestamp":"2026-03-06T04:46:18.764Z","level":"info","message":"执行选项","data":{"taskId":"task-1772772378762-zkg8xw2ps","taskType":"medium","timeout":900000,"tier":"quick"}}
+{"timestamp":"2026-03-06T04:46:59.373Z","level":"info","message":"统计更新完成","data":{"taskType":"medium","avgDuration":40607,"p90":40607,"successRate":1}}
+{"timestamp":"2026-03-06T04:46:59.374Z","level":"info","message":"任务完成","data":{"taskId":"task-1772772378762-zkg8xw2ps","duration":40607,"exitCode":0}}
+{"timestamp":"2026-03-06T06:41:43.300Z","level":"info","message":"开始执行任务 [simple]","data":{"taskId":"task-1772779303299-gfmvfgwoa","taskLength":34}}
+{"timestamp":"2026-03-06T06:41:43.302Z","level":"info","message":"执行选项","data":{"taskId":"task-1772779303299-gfmvfgwoa","taskType":"simple","timeout":900000,"tier":"standard"}}
