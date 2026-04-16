@@ -11,10 +11,14 @@
             "id": "308510ea5507666c",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "00_Inbox/Mac Test.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "新标签页"
+              "title": "Mac Test"
             }
           }
         ]
@@ -187,8 +191,9 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "c6a3fd21f257f735",
+  "active": "308510ea5507666c",
   "lastOpenFiles": [
+    "00_Inbox/Mac Test.md",
     "欢迎.md",
     "99_Attachments",
     "88_Templates",
