@@ -1,4 +1,4 @@
-# AntAlpha AI 业务汇报（产品/运营）
+# Antalpha AI 业务汇报（产品/运营）
 > 版本：v2.4.1 | 日期：2026-04-16
 
 > 本版更新：基于官网已上线能力重写路线图 + 意图层 MCP 补全 + Token 算力包商业闭环 + GTM运营策略 + 世界杯营销专项
@@ -517,12 +517,12 @@ Moltbook 是基于 OpenClaw 的 Agent 社交网络（Reddit 风格），上线 1
 
 ```
 传统 Referral：用户 A 推荐用户 B → 奖励 A
-Agent Referral：Agent A 使用 Antalpha MCP → Agent A 的主人看到效果 → 主人推荐给 Agent B 的主人
+Agent Referral：Agent A 使用 Antalpha AI → Agent A 的主人看到效果 → 主人推荐给 Agent B 的主人
 ```
 
 **为什么这个策略独特且不可复制：**
 - OpenClaw 是我们的底层框架，装了 MCP 的 Agent 自然会展示数据来源
-- 每次 Agent 输出结果都会显示 "Powered by Antalpha MCP" → 其他的 Agent 主人看到
+- 每次 Agent 输出结果都会显示 "Powered by Antalpha AI" → 其他的 Agent 主人看到
 - 这不是我们在推产品，是用户的真实 Agent 在帮我们推
 
 **具体实现：**
@@ -685,7 +685,7 @@ KOL 内容（antalpha.com/?ref=kol_name）→ 注册（记录 referral_source）
 | 预测战绩排行 | 准确率公开透明，建立信任 |
 | 实时赔率追踪 | 比赛中赔率变化 |
 
-**一句话差异：ChatGPT 说"德国可能赢"，Antalpha 显示"德国 58%，比分 2-1，市场定价 55%，Edge +3%，一键下注"。**
+**一句话差异：ChatGPT 说"德国可能赢"，Antalph AI 显示"德国 58%，比分 2-1，市场定价 55%，Edge +3%，一键下注"。**
 
 ### 预测引擎（简要）
 
@@ -857,4 +857,4 @@ v2.3 主战略（长期）          世界杯战役（短期引爆）
 
 ---
 
-*v2.3 更新说明：基于 antalpha.com 官网已上线能力重写路线图（Phase 1 已完成部分标注）；补全意图层 MCP 规划；新增 Token 算力包商业闭环章节；竞品对比加入 AI Agent 框架列。* 增加GTM运营策略 * 增加世界杯营销专项 
+*v2.4.1 更新说明：基于 antalpha.com 官网已上线能力重写路线图（Phase 1 已完成部分标注）；补全意图层 MCP 规划；新增 Token 算力包商业闭环章节；竞品对比加入 AI Agent 框架列。* 增加GTM运营策略 * 增加世界杯营销专项 

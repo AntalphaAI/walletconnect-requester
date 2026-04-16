@@ -205,6 +205,10 @@
   },
   "active": "e85bc735b1c20390",
   "lastOpenFiles": [
+    "copilot/copilot-conversations/AI_Reviews_AntAlpha_Report@20260416_135712.md",
+    "copilot/copilot-conversations/汇报材料评估@20260416_134731.md",
+    "copilot/copilot-conversations/你觉得这个汇报文档用45分钟来汇报合适吗？@20260416_133953.md",
+    "copilot/copilot-conversations",
     "copilot/copilot-custom-prompts/Clip Web Page.md",
     "copilot/copilot-custom-prompts/Clip YouTube Transcript.md",
     "copilot/copilot-custom-prompts/Rewrite as tweet thread.md",
@@ -230,16 +234,12 @@
     "reports/web3-investor-v3.8-release-summary.md",
     "reports/web3-investor-v3.8-iteration-plan-20260413.md",
     "reports/web3-investor-v3.8-debug-report-20260413.md",
-    "reports/web3-investor-v3.7-review.md",
-    "reports/web3-investor-completion-summary-20260413.md",
-    "reports/macro_analysis_2026-04-13.md",
     "reports",
     "docs",
     "99_Attachments",
     "88_Templates",
     "30_Resources",
     "20_Knowledge",
-    "10_Projects",
-    "00_Inbox"
+    "10_Projects"
   ]
 }
