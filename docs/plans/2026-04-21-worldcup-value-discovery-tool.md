@@ -1,9 +1,33 @@
 # Antalpha AI World Cup Value Discovery Tool — Product Plan
 
-> **Date**: 2026-04-21 (Updated: 2026-04-21 15:32)
+> **Date**: 2026-04-21 (Updated: 2026-04-21 15:45)
 > **Status**: Draft — Pending Approval
 > **Owner**: 丁丁 (Bevan)
-> **Version**: 2.1 (Pivot + Poly-Master Integration)
+> **Version**: 2.2 (Project placement + Poly-Master Integration)
+
+## Project Placement
+
+This module lives inside the **antalpha-com/antalpha-skills** monorepo, as a **peer-level skill** alongside existing modules:
+
+```
+~/antalpha-com/antalpha-skills/
+├── apps/mcp-skills/          # NestJS MCP server
+├── libs/skills/
+│   ├── web3-investor/       # Existing
+│   ├── poly-master/         # Existing — Polymarket data (markets + orderbook)
+│   ├── smart-money/         # Existing
+│   ├── wallet-guard/        # Existing
+│   ├── ...
+│   └── worldcup-predictor/  # 🆕 NEW — This module
+└── libs/shared/              # Shared utilities
+```
+
+**Module name**: `worldcup-predictor`
+**Level**: Same as `web3-investor` — a top-level skill under `libs/skills/`
+**Relationships**:
+- **Depends on**: `poly-master` (for Polymarket market data + orderbook)
+- **Independent of**: `web3-investor`, `smart-money`, other skills
+- **Uses**: `libs/shared/` for common utilities
 
 ---
 
@@ -204,11 +228,12 @@ April 21 ─── April 30 ─── May 15 ─── May 31 ─── June 10 
 
 ## Task 0.1: Project Scaffolding
 
-**File**: `worldcup-pipeline/`
+**File**: `~/antalpha-com/antalpha-skills/libs/skills/worldcup-predictor/`
 
 ```
-worldcup-pipeline/
+worldcup-predictor/
 ├── README.md
+├── SKILL.md                 # Skill definition (follows antalpha-skills convention)
 ├── requirements.txt
 ├── .env.example
 ├── config/
@@ -230,6 +255,8 @@ worldcup-pipeline/
     ├── test_football.py
     └── test_merger.py
 ```
+
+> ⚠️ **Convention**: Follow the same project conventions as `web3-investor` and `poly-master` — check their `SKILL.md`, directory structure, and test patterns before starting.
 
 **Action**: Create this structure. `requirements.txt` should include:
 ```
