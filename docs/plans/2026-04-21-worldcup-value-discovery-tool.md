@@ -188,15 +188,17 @@ April 21 ─── April 30 ─── May 15 ─── May 31 ─── June 10 
 ---
 ---
 
-# Phase 0: Data Pipeline — Detailed Execution Plan
+# Phase 0: Football Data Pipeline — Detailed Execution Plan
 
-> **Goal**: Build a unified data pipeline that outputs structured JSON for any World Cup match/event, combining Polymarket market data and football statistics.
+> **Goal**: Build football data pipeline that feeds into poly-master's Polymarket data, producing unified structured JSON for any World Cup match/event.
 >
-> **Duration**: 2 weeks (April 21 → April 30)
+> **Duration**: 1 week (April 21 → April 28) — *Reduced from 2 weeks since Polymarket side is covered by poly-master*
 >
-> **Deliverable**: A Python project `worldcup-pipeline/` with scripts that can be run independently and produce structured output.
+> **Deliverable**: A Python project `worldcup-pipeline/` with football data fetchers + poly-master integration layer.
 >
 > **Handoff**: This plan is designed to be directly executable by a coding agent (Claude Code / Codex / etc.)
+>
+> ⚡ **Scope Change**: Polymarket data (Gamma API + CLOB API) is **already handled** by `poly-master-markets` and `poly-master-order-book`. This phase focuses ONLY on football data + integration.
 
 ---
 
@@ -212,24 +214,19 @@ worldcup-pipeline/
 ├── config/
 │   └── settings.py          # Central configuration
 ├── data/
-│   ├── raw/                 # Raw API responses (gitignored)
+│   ├── raw/                 # Raw data (gitignored)
 │   └── processed/           # Cleaned/structured output
 ├── src/
 │   ├── __init__.py
-│   ├── polymarket/
-│   │   ├── __init__.py
-│   │   ├── gamma_client.py  # Gamma API wrapper
-│   │   ├── clob_client.py   # CLOB API wrapper (prices/orderbook)
-│   │   └── models.py        # Pydantic models for market data
+│   ├── polymarket_adapter.py # Wrapper around poly-master tools
 │   ├── football/
 │   │   ├── __init__.py
 │   │   ├── elo_ratings.py   # Elo/pi-ratings fetcher
 │   │   ├── match_data.py    # Match/schedule data via soccerdata
 │   │   └── models.py        # Pydantic models for football data
-│   ├── merger.py            # Merge Polymarket + football data
+│   ├── merger.py            # Merge poly-master + football data
 │   └── main.py              # CLI entry point
 └── tests/
-    ├── test_gamma.py
     ├── test_football.py
     └── test_merger.py
 ```
@@ -243,184 +240,107 @@ pandas>=2.0
 soccerdata>=1.2
 ```
 
+**Note on poly-master integration**: The coding agent should call `poly-master-markets` and `poly-master-order-book` as MCP tools (or via their underlying HTTP endpoints). If MCP is not available in the agent's environment, implement thin HTTP wrappers that call the same endpoints.
+
 **Verification**: `pip install -r requirements.txt` succeeds.
 
 ---
 
-## Task 0.2: Polymarket Gamma API Client
+## Task 0.2: Poly-Master Adapter (Thin Wrapper)
 
-**File**: `src/polymarket/gamma_client.py`
+**File**: `src/polymarket_adapter.py`
 
-**API Base**: `https://gamma-api.polymarket.com`
-
-**Endpoints to implement**:
-
-### 2a. Search World Cup Events
-
-```python
-def search_worldcup_events() -> list[Event]:
-    """
-    GET /events?slug=2026-fifa-world-cup-winner-595
-    
-    Also try:
-    GET /events?tag=soccer&_q=world+cup
-    GET /public-search?_q=fifa+world+cup+2026
-    
-    Returns list of Event objects with nested markets.
-    """
-```
-
-**Key fields to extract from each event**:
-- `id`, `slug`, `title`, `description`
-- `startDate`, `endDate`
-- `markets[]` — each market contains:
-  - `id`, `question`, `slug`
-  - `outcomes` (JSON string: `["Yes","No"]` or `["Argentina","Brazil",...]`)
-  - `outcomePrices` (JSON string: `["0.65","0.35"]`)
-  - `volume`, `liquidity`, `bestBid`, `bestAsk`
-  - `conditionId`, `clobTokenIds`
-  - `active`, `closed`, `acceptingOrders`
-
-### 2b. Get Event by Slug
-
-```python
-def get_event(slug: str) -> Event:
-    """GET /events?slug={slug}"""
-```
-
-### 2c. Get All Active World Cup Markets
-
-```python
-def get_active_worldcup_markets(tag: str = None) -> list[Market]:
-    """
-    Strategy 1: Filter by tag
-    GET /markets?active=true&closed=false&tag=soccer
-    
-    Strategy 2: Search
-    GET /markets?_q=world+cup&active=true
-    
-    Strategy 3: Via events endpoint (most efficient)
-    GET /events?active=true&closed=false&tag_id={worldcup_tag_id}
-    """
-```
-
-### 2d. Discover Sports Tags
-
-```python
-def get_sports_tags() -> list[Tag]:
-    """GET /sports — returns tag IDs for all sports"""
-```
-
-### 2e. Get Market Price History
-
-```python
-def get_market_history(market_id: str) -> list[PricePoint]:
-    """
-    GET /markets/{id}
-    Extract price history from the response if available.
-    Fallback: Use CLOB API for historical prices.
-    """
-```
-
-**Pydantic Models** (`src/polymarket/models.py`):
+> This is a thin adapter layer, not a full API client. It wraps the existing poly-master tools for use in the pipeline.
 
 ```python
 from pydantic import BaseModel
 from datetime import datetime
 
-class Market(BaseModel):
+class PolymarketMarket(BaseModel):
     id: str
     question: str
-    slug: str
+    condition_id: str
     outcomes: list[str]
-    outcome_prices: list[float]
+    outcome_prices: list[float]  # Gamma cached (minute-level)
     volume: float
     liquidity: float
-    best_bid: float | None
-    best_ask: float | None
+    end_date: datetime
+    clob_token_ids: list[str]
     active: bool
     closed: bool
-    condition_id: str
-    clob_token_ids: list[str]
-    accepting_orders: bool
 
-class Event(BaseModel):
-    id: str
-    slug: str
-    title: str
-    description: str
-    start_date: datetime | None
-    end_date: datetime | None
-    markets: list[Market]
+class OrderBook(BaseModel):
+    bids: list[dict]   # [{"price": "0.64", "size": "500"}, ...]
+    asks: list[dict]
+    mid_price: float   # Real-time consensus probability (second-level)
+
+class PolymarketAdapter:
+    """Adapter wrapping poly-master tools for pipeline use."""
+    
+    def search_markets(self, query: str, active: bool = True, 
+                       closed: bool = False, limit: int = 50) -> list[PolymarketMarket]:
+        """
+        Wraps: poly-master-markets
+        
+        Usage:
+            adapter.search_markets("FIFA 2026 winner")
+            adapter.search_markets("World Cup Group A")
+        """
+        # Call poly-master-markets via MCP or HTTP
+        # Parse response into PolymarketMarket objects
+        ...
+    
+    def get_orderbook(self, token_id: str) -> OrderBook:
+        """
+        Wraps: poly-master-order-book
+        
+        Usage:
+            markets = adapter.search_markets("FIFA 2026")
+            token_id = markets[0].clob_token_ids[0]
+            book = adapter.get_orderbook(token_id)
+            print(book.mid_price)  # Real-time probability
+        """
+        # Call poly-master-order-book via MCP or HTTP
+        # Parse response into OrderBook object
+        ...
+    
+    def get_enriched_market(self, query: str) -> list[dict]:
+        """
+        Two-step workflow: search + get real-time mid_price for each outcome.
+        
+        For each market:
+        1. Get market data from poly-master-markets
+        2. For each outcome, get clobTokenIds[i] → poly-master-order-book → mid_price
+        3. Return enriched data with both cached and real-time prices
+        
+        Returns:
+        [{
+            "question": "Will Argentina win FIFA 2026?",
+            "outcomes": ["Yes", "No"],
+            "gamma_prices": [0.25, 0.75],    # Cached
+            "realtime_prices": [0.26, 0.74],  # From mid_price
+            "volume": 500000,
+            "liquidity": 200000
+        }, ...]
+        """
+        ...
 ```
 
 **Verification**:
 ```bash
-python -m src.polymarket.gamma_client --search "world cup"
-# Should return events with market data
+python -m src.polymarket_adapter --search "FIFA 2026"
+# Should return markets with real-time mid_prices
 ```
 
 ---
 
-## Task 0.3: Polymarket CLOB API Client
-
-**File**: `src/polymarket/clob_client.py`
-
-**API Base**: `https://clob.polymarket.com`
-
-> **Note**: CLOB API provides real-time prices and orderbook data. For our read-only use case, no authentication is needed for public endpoints.
-
-**Endpoints to implement**:
-
-### 3a. Get Market Price
-
-```python
-def get_market_price(token_id: str) -> dict:
-    """
-    GET /price?token_id={token_id}&side=buy
-    
-    Returns: { "price": "0.65" }
-    """
-```
-
-### 3b. Get Orderbook
-
-```python
-def get_orderbook(token_id: str) -> dict:
-    """
-    GET /book?token_id={token_id}
-    
-    Returns: { "bids": [...], "asks": [...], "hash": "..." }
-    
-    Each bid/ask: { "price": "0.65", "size": "100" }
-    """
-```
-
-### 3c. Get Midpoint Price
-
-```python
-def get_midpoint(token_id: str) -> float:
-    """
-    Calculate midpoint from best bid + best ask.
-    midpoint = (best_bid + best_ask) / 2
-    """
-```
-
-**Verification**:
-```bash
-python -m src.polymarket.clob_client --price <token_id>
-# Should return current price
-```
-
----
-
-## Task 0.4: Football Data — Elo Ratings
+## Task 0.3: Football Data — Elo Ratings
 
 **File**: `src/football/elo_ratings.py`
 
 **Data Sources** (all free, no API key required):
 
-### 4a. World Football Elo Ratings
+### 3a. World Football Elo Ratings
 
 ```python
 def fetch_world_elo_ratings() -> dict[str, float]:
@@ -434,7 +354,7 @@ def fetch_world_elo_ratings() -> dict[str, float]:
     """
 ```
 
-### 4b. Pi-Ratings (if available)
+### 3b. Pi-Ratings (if available)
 
 ```python
 def fetch_pi_ratings() -> dict[str, float]:
@@ -467,7 +387,7 @@ python -m src.football.elo_ratings
 
 ---
 
-## Task 0.5: Football Data — Match Schedule & History
+## Task 0.4: Football Data — Match Schedule & History
 
 **File**: `src/football/match_data.py`
 
@@ -488,7 +408,7 @@ def fetch_worldcup_schedule() -> pd.DataFrame:
     """
 ```
 
-### 5a. Historical Match Data (for model training)
+### 4a. Historical Match Data (for model training)
 
 ```python
 def fetch_historical_international_matches(league: str = "FIFA_WC") -> pd.DataFrame:
@@ -506,7 +426,7 @@ def fetch_historical_international_matches(league: str = "FIFA_WC") -> pd.DataFr
     """
 ```
 
-### 5b. Recent Form Data
+### 4b. Recent Form Data
 
 ```python
 def fetch_recent_form(team: str, n_matches: int = 10) -> pd.DataFrame:
@@ -526,7 +446,7 @@ python -m src.football.match_data --team Argentina
 
 ---
 
-## Task 0.6: Data Merger
+## Task 0.5: Data Merger
 
 **File**: `src/merger.py`
 
@@ -612,7 +532,7 @@ python -m src.merger --event "2026-fifa-world-cup-winner-595"
 
 ---
 
-## Task 0.7: CLI Entry Point & Automation
+## Task 0.6: CLI Entry Point & Automation
 
 **File**: `src/main.py`
 
@@ -643,7 +563,7 @@ def health_check() -> dict:
 
 ---
 
-## Task 0.8: Data Quality Report
+## Task 0.7: Data Quality Report
 
 **File**: `data/processed/data_quality_report.md`
 
@@ -675,32 +595,30 @@ After running the pipeline, generate a report covering:
 
 ```
 Task 0.1 (Scaffold)
-  ├── Task 0.2 (Gamma API)
-  ├── Task 0.3 (CLOB API)
-  ├── Task 0.4 (Elo Ratings)
-  ├── Task 0.5 (Match Data)
+  ├── Task 0.2 (Poly-Master Adapter) ← thin wrapper, fast
+  ├── Task 0.3 (Elo Ratings)
+  └── Task 0.4 (Match Data)
   └── (parallel)
 
-Task 0.2 + 0.3 + 0.4 + 0.5
-  └── Task 0.6 (Merger)
-        └── Task 0.7 (CLI)
-              └── Task 0.8 (Quality Report)
+Task 0.2 + 0.3 + 0.4
+  └── Task 0.5 (Merger)
+        └── Task 0.6 (CLI)
+              └── Task 0.7 (Quality Report)
 ```
 
-**Tasks 0.2-0.5 are fully parallel.** A coding agent can implement all four simultaneously.
+**Tasks 0.2-0.4 are fully parallel.** Task 0.2 is trivial (thin wrapper). Tasks 0.3-0.4 are the real work.
 
 ---
 
 ## Task Execution Checklist (for Coding Agent)
 
 - [ ] 0.1 Create project structure and install dependencies
-- [ ] 0.2 Implement Gamma API client with all endpoints
-- [ ] 0.3 Implement CLOB API client with all endpoints
-- [ ] 0.4 Implement Elo ratings fetcher
-- [ ] 0.5 Implement match data fetcher via soccerdata
-- [ ] 0.6 Implement data merger with unified JSON output
-- [ ] 0.7 Implement CLI entry point with all commands
-- [ ] 0.8 Run full pipeline and generate data quality report
+- [ ] 0.2 Implement poly-master adapter (thin wrapper for markets + orderbook)
+- [ ] 0.3 Implement Elo/pi-ratings fetcher
+- [ ] 0.4 Implement match data fetcher via soccerdata
+- [ ] 0.5 Implement data merger with unified JSON output
+- [ ] 0.6 Implement CLI entry point with all commands
+- [ ] 0.7 Run full pipeline and generate data quality report
 - [ ] Write tests for all modules
 - [ ] Add error handling and retry logic for API calls
 - [ ] Add logging (structured, to stdout)
@@ -710,9 +628,9 @@ Task 0.2 + 0.3 + 0.4 + 0.5
 
 ## Notes for Coding Agent
 
-1. **No authentication needed** for any Phase 0 API. All Polymarket data endpoints are public.
-2. **Rate limiting**: Polymarket Gamma API may rate-limit aggressive polling. Add `time.sleep(0.5)` between batch requests.
-3. **CLOB V2 Migration**: Polymarket is migrating to CLOB V2. Use current V1 endpoints for now; the read-only price/book endpoints are stable.
+1. **Polymarket data is handled by poly-master** — do NOT re-implement Gamma/CLOB API clients. Use the existing `poly-master-markets` and `poly-master-order-book` tools via MCP or their underlying endpoints.
+2. **outcomePrices vs mid_price**: Always prefer `mid_price` from orderbook for precision. `outcomePrices` is Gamma cached (minute-level delay).
+3. **token_id ≠ conditionId**: Use `clobTokenIds` from markets response, never `conditionId`, when calling orderbook.
 4. **Naming mismatches**: Polymarket uses full country names ("South Korea"), while some data sources use codes ("KOR"). Build a name mapping dictionary.
 5. **soccerdata limitations**: The library may not have 2026 World Cup data yet (tournament hasn't started). Focus on historical data for model training.
 6. **All output must be JSON** — structured, typed, ready for the next phase (prediction engine).
