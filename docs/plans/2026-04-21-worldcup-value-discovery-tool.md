@@ -1,9 +1,9 @@
 # Antalpha AI World Cup Value Discovery Tool — Product Plan
 
-> **Date**: 2026-04-21
+> **Date**: 2026-04-21 (Updated: 2026-04-21 15:32)
 > **Status**: Draft — Pending Approval
 > **Owner**: 丁丁 (Bevan)
-> **Version**: 2.0 (Pivot from "Prediction" to "Value Discovery")
+> **Version**: 2.1 (Pivot + Poly-Master Integration)
 
 ---
 
@@ -28,7 +28,43 @@ Management raised valid concerns: competing on prediction accuracy against profe
 
 ---
 
-## 2. Market Validation
+## 2. Existing Infrastructure: Poly-Master
+
+> ⚡ **Key Update**: The team already has `poly-master` tools covering Polymarket data. Phase 0 scope is reduced.
+
+### poly-master-markets (市场搜索)
+
+| Param | Type | Required | Description |
+|---|---|---|---|
+| `query` | string | ✅ | Search keywords (e.g. "FIFA 2026") |
+| `limit` | int | ❌ | Max results, default 20 |
+| `active` | bool | ❌ | Active markets only |
+| `closed` | bool | ❌ | Include closed markets |
+
+**Returns**: `id`, `question`, `conditionId`, `outcomes`, `outcomePrices` (Gamma cached), `volume`, `liquidity`, `endDate`, `clobTokenIds`
+
+### poly-master-order-book (实时订单簿)
+
+| Param | Type | Required | Description |
+|---|---|---|---|
+| `token_id` | string | ✅ | From `clobTokenIds` field in markets response |
+
+**Returns**: `bids[]`, `asks[]`, `mid_price` (real-time consensus probability, **seconds-level**)
+
+### ⚠️ Important Notes
+- `outcomePrices` = Gamma cached price (minute-level delay) → use for overview
+- `mid_price` = CLOB real-time price (second-level) → use for precision analysis
+- `token_id` ≠ `conditionId` → always use `clobTokenIds` from markets response
+
+### Two-Step Workflow
+```
+1. poly-master-markets(query="FIFA 2026 winner", active=true)
+   → get clobTokenIds[0] as token_id
+2. poly-master-order-book(token_id="...")
+   → mid_price = real-time market probability
+```
+
+---
 
 ### Polymarket World Cup 2026 Markets (Already Live)
 
