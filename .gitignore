@@ -1,2 +1,11 @@
+# Obsidian workspace
 .obsidian/workspace.json
 .DS_Store
+
+# Large media files
+*.mp4
+*.mp3
+*.wav
+
+# Only track docs/ and reports/ — ignore everything else
+# (untracked files won't be added by sync script)
